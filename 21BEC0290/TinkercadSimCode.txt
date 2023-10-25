@@ -1,0 +1,56 @@
+#define RED 6
+#define GREEN 5
+#define BUZZER 13
+#define SMOKE A0
+#define TEMP A1
+#define FLAME A2
+#define SMOKE_THRESHOLD	350
+#define TEMP_THRESHOLD	200
+#define FLAME_THRESHOLD	1024
+
+
+void setup()
+{
+  pinMode(RED, OUTPUT);
+  pinMode(GREEN, OUTPUT);
+  Serial.begin(9600);
+  pinMode(SMOKE,INPUT);
+  pinMode(TEMP,INPUT);
+  pinMode(FLAME,INPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  digitalWrite(GREEN, HIGH);
+}
+
+void siren(int buzzer){
+  for(int hz = 440; hz < 1000; hz++){
+    tone(buzzer, hz, 50);
+    delay(3);
+  }
+
+  for(int hz = 1000; hz > 440; hz--){
+    tone(buzzer, hz, 50);
+    delay(3);
+  }
+}
+
+void loop()
+{
+  Serial.println("Gas Val: "+String(analogRead(SMOKE))+", Temperature: "+String(analogRead(TEMP))+", Flame: "+String(analogRead(FLAME)));
+  if (analogRead(SMOKE) > SMOKE_THRESHOLD || analogRead(TEMP) > TEMP_THRESHOLD || analogRead(FLAME) > FLAME_THRESHOLD)
+  {
+    digitalWrite(RED, HIGH);
+    digitalWrite(GREEN, LOW);
+    siren(BUZZER);
+    //tone(BUZZER, 600, 50);
+    digitalWrite(BUZZER, HIGH);
+    
+  }
+  else{
+    digitalWrite(RED, LOW);
+    digitalWrite(BUZZER, LOW);
+    noTone(BUZZER);
+    digitalWrite(GREEN, HIGH);
+  }	
+  delay(400);
+}
